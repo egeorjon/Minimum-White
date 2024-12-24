@@ -1,0 +1,2 @@
+# Minimum-White
+GoHugo Theme
