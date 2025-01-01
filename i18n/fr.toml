@@ -1,0 +1,74 @@
+[copy-link]
+    other = "Copier le lien de ce chapitre : {{ .text }}"
+
+[external]
+    other = "Source externe"
+
+[image-not-found]
+    other = "Image absente: %s"
+
+[series-posts]
+    other = "Les articles du dossier :"
+
+[not-post-yet]
+    other = "Pas encore d'articles dans ce dossier"
+
+[home]
+    other = "Accueil"
+
+[gohome]
+    other = "Aller à l'accueil du site"
+
+[blog]
+    other = "Blog"
+
+[architecture]
+    other = "Architecture IT"
+
+[project]
+    other = "Projet"
+
+[photo]
+    other = "Photo"
+
+[references]
+    one   = "Référence"
+    other = "Références"
+
+[in]
+    other = "dans"
+
+[posted-on]
+    other = "Publié le"
+
+[reading-label]
+    other = "Temps de lecture"
+
+[reading-time]
+    one   = "Une minute de lecture"
+    other = "{{ .Count }} minutes de lecture"
+
+[tags]
+    one   = "Mot-clé"
+    other = "Mots-clés"
+
+[series]
+    one   = "Le dossier"
+    other = "Les dossiers"
+
+[post-category]
+    other = "Article de la catégorie {{ .Name }}"
+
+[posts-of]
+    one   = "Article de la rubrique"
+    other = "Articles de la rubrique"
+
+[posts-of-section]
+    one   = "Article de la rubrique {{ .Title }}"
+    other = "Articles de la rubrique {{ .Title }}"
+
+[on-the-site]
+    other = "sur le site"
+
+[available-under-lic]
+    other = "disponible sous licence"

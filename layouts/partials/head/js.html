@@ -1,12 +1,24 @@
-{{- with resources.Get "js/main.js" }}
-  {{- if eq hugo.Environment "development" }}
-    {{- with . | js.Build }}
-      <script src="{{ .RelPermalink }}"></script>
-    {{- end }}
-  {{- else }}
-    {{- $opts := dict "minify" true }}
-    {{- with . | js.Build $opts | fingerprint }}
-      <script src="{{ .RelPermalink }}" integrity="{{- .Data.Integrity }}" crossorigin="anonymous"></script>
-    {{- end }}
-  {{- end }}
-{{- end }}
+{{- $scripts_list := slice "bootstrap-533/js/collapse.js" 
+                           "bootstrap-533/js/offcanvas.js" -}}
+{{- $target := "/js/minimum-white.js" -}}
+{{/* if eq .Layout "search"        -*/}}
+  {{/*- $scripts_list = $scripts_list | append "fuse.700/fuse.min.js" "js/search.js" -*/}}
+  {{/*- $target = "/js/inspired4-search.js" -*/}}
+{{/*- else -*/}}
+{{- if and (eq .Kind "page") (ne .Layout "sitepage") -}}
+  {{- $scripts_list = $scripts_list | append "simple-lightbox/simplelightbox.js" -}}
+  {{- $target = "/js/minimum-white-page.js" -}}
+{{- end -}}
+{{- $scripts_list = $scripts_list | append "js/main.js" -}}
+{{- $res := slice -}}
+{{- range $script := $scripts_list -}}
+  {{- with resources.Get $script -}}
+    {{- with . | js.Build (dict "minify" true) -}}
+      {{- $res = $res | append . -}}
+    {{- end -}}{{/* end of js.build */}}
+  {{- end -}}{{/* end of with resources.get */}}
+{{- end -}}{{/* end of range */}}
+{{- $final := $res | resources.Concat $target | fingerprint -}}
+{{- with $final -}}
+<script defer src="{{- .RelPermalink -}}" integrity="{{- .Data.Integrity -}}" crossorigin="anonymous"></script>
+{{- end -}}

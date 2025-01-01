@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="{{ site.Language.LanguageCode }}" dir="{{ or site.Language.LanguageDirection `ltr` }}">
+<html lang="{{ site.Language.LanguageCode }}" dir="{{ or site.Language.LanguageDirection `ltr` }}" class="no-js">
 <head>
+  {{/*- partial "inline/cache.html" . -*/}}
   {{ partial "head.html" . }}
 </head>
 <body>
   <header>
     {{ partial "header.html" . }}
+    ==Kind:{{- .Kind -}}==Type:{{- .Type -}}=={{- .Scratch.Get "page-cache" -}}=={{- .Layout -}}=={{- with .Parent -}}{{- .Kind -}}{{- end -}}==<br />
   </header>
   <main>
     {{ block "main" . }}{{ end }}
@@ -15,3 +17,16 @@
   </footer>
 </body>
 </html>
+{{- define "partials/inline/cache.html" -}}
+  {{- $cache := false -}}
+  {{- if eq .Kind "home" -}}
+    {{- $cache = "home" -}}
+  {{- else if eq .Kind "page" -}}
+    {{- $cache = .Title | anchorize -}}
+  {{- else if eq .Kind "section" -}}
+    {{- $cache = printf "section-%s" (.Title | anchorize) -}}
+  {{- else if or (eq .Kind "taxonomy") (eq .Kind "term") -}}
+    {{- $cache = printf "%s-%s-%s" .Kind .Type (.Title | anchorize) -}}
+  {{- end -}}
+  {{- .Scratch.Set "page-cache" $cache -}}
+{{- end -}}

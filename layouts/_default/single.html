@@ -1,10 +1,62 @@
-{{ define "main" }}
-  <h1>{{ .Title }}</h1>
+{{- define "main" -}}
+  {{- $current_page  := . -}}
 
-  {{ $dateMachine := .Date | time.Format "2006-01-02T15:04:05-07:00" }}
-  {{ $dateHuman := .Date | time.Format ":date_long" }}
-  <time datetime="{{ $dateMachine }}">{{ $dateHuman }}</time>
+  {{- $def_params   := index site.Params "single" -}}
+  {{- $meta         := (index $def_params "meta") -}}  {{/* | default (index $def_defaults "meta") */}}
 
-  {{ .Content }}
-  {{ partial "terms.html" (dict "taxonomy" "tags" "page" .) }}
+  {{/* ---- Get background image ---- */}}
+  {{- $bckgnd := "" -}}
+  {{/*- if $display_img -*/}}
+    {{- if isset .Params "images" -}}  
+      {{- $image := .Resources.GetMatch (index .Params.images 0) -}}
+      {{- with $image -}}
+        {{- $bckgnd = printf "style=\"background: url('%s') center center / cover no-repeat; aspect-ratio: auto 234 / 100;\"" (index $.Params.images 0) -}}
+      {{- end -}}
+    {{- end -}}
+  {{/*- end -*/}}
+<article>
+  <header class="single-headline-wrapper single-headline-wrapper-photo" {{- $bckgnd | safeHTMLAttr -}}>
+    <div class="single-headline-background single-headline-background-photo"></div>
+    <div class="container single-headline single-headline-photo">
+      {{- partial "breadcrumb.html" . -}}
+      <div class="row">
+        <div class="col">
+          {{- with $meta.top -}}
+          <div class="single-post-meta single-post-meta-top">
+              {{- partial "meta.html" (dict "current" $current_page "context" $current_page.Parent "meta" . "class" "post-meta-top") -}}
+          </div>
+          {{- end -}}
+          <h1 class="page-title">{{- .Title -}}</h1>
+          <p class="page-summary">
+            {{- with .Summary -}}
+              {{- . -}}
+            {{- end -}}
+          </p>
+          {{- with $meta.middle -}}
+          <div class="single-post-meta single-post-meta-middle">
+              {{- partial "meta.html" (dict "current" $current_page "context" $current_page.Parent "meta" . "class" "post-meta-middle") -}}
+          </div>
+          {{- end -}}      
+          {{- with $meta.bottom -}}
+          <div class="single-post-meta single-post-meta-bottom">
+              {{- partial "meta.html" (dict "current" $current_page "context" $current_page.Parent "meta" . "class" "post-meta-bottom") -}}
+          </div>
+          {{- end -}}
+        </div><!-- col -->
+      </div><!-- row -->
+    </div><!-- container -->
+  </header>
+  <section class="single-main">
+    <div class="container">
+      <div class="row">
+        <aside class="single-content col-12">
+          {{- replace .Content .Summary "" | safeHTML -}}
+          {{- with .Params.references -}}
+            {{- partial "partials/references.html" (dict "context" $current_page "refs" .) -}}
+          {{- end -}}
+        </aside><!-- end of col -->
+      </div><!-- end of row -->
+    </div><!-- end of container -->
+  </section>
+</article>
 {{ end }}

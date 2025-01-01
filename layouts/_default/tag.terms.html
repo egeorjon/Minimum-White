@@ -1,0 +1,51 @@
+{{- define "main" -}}
+  {{- $current_page := . -}}
+  {{- $def_params   := index site.Params "list_tags" -}}
+   <header class="tags-headline-wrapper">
+    <div class="tags-headline-background"></div>
+    <div class="container tags-headline">
+        <div class="row">
+            <div class="col">
+                {{- partial "breadcrumb.html" . -}}
+                <h1 class="page-title">{{- .Title -}}</h1>
+                <p class="page-summary">
+                {{- with .Summary -}}
+                    {{- . -}}
+                {{- else -}}
+                    {{- with .Description -}}
+                    {{- . -}}
+                    {{- end -}}
+                {{- end -}}
+                </p>
+            </div><!-- col -->
+        </div><!-- row -->
+    </div><!-- container -->
+  </header>
+  {{- $paginator := .Paginator -}}
+  <section class="tags-content-wrapper">
+    <div class="container">
+        <div class="row">
+          <div class="col">
+            {{- with site.Taxonomies.tags -}}
+                {{- $font_unit  := "px"                                 -}}
+                {{- $font_max   := $def_params.font_largest             -}}
+                {{- $font_min   := $def_params.font_smallest            -}}
+                {{- $font_gap   := sub $font_max $font_min              -}}
+                {{- $count_max  := add (len (index .ByCount 0).Pages) 1 -}}
+                <ul>
+                {{- range . -}}
+                    {{/*- $font_size := math.Add $font_min (math.Mul (math.Div (float .Count) (float $count_max)) $font_gap) -*/}}
+                    {{- $font_size := math.Add $font_min (math.Mul (math.Div (math.Log .Count) (math.Log $count_max)) $font_gap) -}}
+                    {{- $style     := ( printf "font-size:%f%s" $font_size $font_unit) -}}
+                    <li><a href="{{- .Page.Permalink -}}" title="{{- .Page.Title -}} ({{ .Count -}})" style="{{- $style | safeCSS -}}">{{- humanize .Page.Title }}</a> </li>
+                {{- end -}}
+                </ul>                 
+            {{- end -}}
+          </div><!-- col -->
+        </div><!-- row -->
+    </div><!-- container -->
+  </section>
+  <footer class="tags-footer">
+    Footer
+  </footer>
+{{- end -}}

@@ -1,0 +1,33 @@
+{{- $icons := dict
+  "caution"   "bi-exclamation-diamond-fill "
+  "important" "bi-exclamation-octagon-fill"
+  "note"      "bi-info-square-fill"
+  "tip"       "bi-lightbulb-fill"
+  "warning"   "bi-exclamation-triangle-fill"
+-}}
+{{- $caption := isset .Attributes "caption" -}}
+{{- $alert   := eq .Type "alert" -}}
+{{- if $caption -}}
+  <figure>
+{{- end -}}
+    <blockquote {{ if $alert -}}class="alert alert-{{- .AlertType -}}" {{ end }}{{ with .Attributes.cite -}}cite="{{- . | safeURL -}}"{{- end -}}>
+      {{- if $alert -}}
+      <p class="alert-heading">
+        <i class="{{- (index $icons .AlertType) -}}"> </i>
+        {{- with .AlertTitle -}}
+          {{- . -}}
+        {{- else -}}
+          {{- or (i18n .AlertType) (title .AlertType) -}}
+        {{- end -}}
+      </p>
+      {{- end -}}
+      {{- .Text -}}
+    </blockquote>
+    {{- with .Attributes.caption -}}
+    <figcaption class="blockquote-caption">
+      {{- . | safeHTML -}}
+    </figcaption>
+    {{- end -}}
+{{- if $caption -}}
+  </figure>
+{{- end -}}

@@ -1,5 +1,92 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width">
-<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ printf "%s | %s" .Title site.Title }}{{ end }}</title>
+
+<script>
+    document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, 'js');
+</script>
+
+{{- $title := slice .Title -}}
+{{- if not .IsHome -}}
+    {{- $title = $title | append (site.Title | markdownify | plainify) -}}
+{{- end -}}
+<title>{{- delimit $title " - " | safeHTML -}}</title>
+
+{{- if ne .Kind "404" -}}
+    {{- $description := .Params.description | default site.Params.description | default "" -}}
+    {{ with $description }}
+        <meta name="description" content="{{- . | markdownify | plainify | safeHTML -}}" />
+    {{ end }}
+    {{- $keywords := .Params.tags | default site.Params.keywords | default "" -}}
+    {{ with $keywords }}
+        <meta name="keywords" content="{{- delimit . ", " | plainify | safeHTML -}}" />
+    {{ end }}
+{{- end -}}
+
+<meta name="rating" content="General">
+
+{{- if .IsHome -}}
+    {{- with site.Params.author }}
+        {{- with .name }}
+        <meta name="author" content="{{- . -}}">
+        {{- end -}}
+    {{- end -}}
+    {{- with site.Params.appName -}}
+        <meta name="application-name" content="{{- . | safeHTML -}}" />
+    {{- end -}}
+{{- end -}}
+
+{{- hugo.Generator -}}
+
+{{- $production := or (or (eq (getenv "HUGO_ENV") "production") hugo.IsProduction) (not hugo.IsServer) -}}
+{{- if $production -}}
+    <meta name="robots" content="index,follow" />
+{{- else -}}
+    <meta name="robots" content="noindex,nofollow" />
+    <meta http-equiv="cache-control" content="no-cache" />
+{{- end }}
+
+<link rel="canonical" href="{{- .Permalink -}}" />
+
+{{- if eq .Kind "section" -}}
+    {{- range first 1 .Pages -}}<link rel="first" href="{{- .Permalink -}}" />{{- end -}}
+    {{- range last  1 .Pages -}}<link rel="last" href="{{- .Permalink -}}">{{- end -}}
+{{- end -}}
+{{- with .Parent -}}
+    {{- if eq .Kind "section" -}}
+        <link rel="index" href="{{- .Permalink -}}">
+        {{- with $.PrevInSection -}}<link rel="prev" href="{{- $.Permalink -}}" />{{- end -}}
+        {{- with $.NextInSection -}}<link rel="next" href="{{- $.Permalink -}}" />{{- end -}}
+    {{- end -}}
+{{- else -}}
+    <link rel="index" href="{{- site.BaseURL -}}">
+{{- end -}}
+
+{{- if eq .Kind "page" -}}
+    {{- with .GetTerms "authors" -}}
+        {{- range first 1 . -}}
+            <link rel="author" href="{{- .Permalink -}}">
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with site.Params.mainSections -}}
+    {{- range . -}}
+        {{ with site.GetPage . -}}
+            {{- $title := .Title -}}
+            {{- with .OutputFormats.Get "rss" -}}
+                {{- printf "<link rel=\"%s\" type=\"%s\" href=\"%s\" title=\"%s\" />" .Rel .MediaType.Type .Permalink $title | safeHTML -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with site.Params.licenceURL -}}
+    <link rel="license" href="{{- . | safeURL -}}" {{ with site.Params.licenceText -}}title="{{- . | safeHTML -}}"{{- end -}}>
+{{- end -}}
+
+{{- with .OutputFormats.Get "rss" -}}
+    {{- printf "<link rel=\"%s\" type=\"%s\" href=\"%s\" title=\"%s\" />" .Rel .MediaType.Type .Permalink site.Title | safeHTML -}}
+{{- end -}}
+
 {{ partialCached "head/css.html" . }}
 {{ partialCached "head/js.html" . }}
